@@ -1,0 +1,550 @@
+{
+  "definitions": {
+    "AppService": {
+      "kind": "service",
+      "@source": "srv/app-service.cds"
+    },
+    "AppService.Airline": {
+      "kind": "entity",
+      "@Capabilities.DeleteRestrictions.Deletable": false,
+      "@Capabilities.InsertRestrictions.Insertable": false,
+      "@Capabilities.UpdateRestrictions.Updatable": false,
+      "@cds.persistence.name": "APPSERVICE_AIRLINE",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "app.flight.Airline"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "IATA": {
+          "@cds.persistence.name": "IATA",
+          "key": true,
+          "type": "cds.String",
+          "length": 2
+        },
+        "Name": {
+          "@Common.Label": {
+            "=": "Airline"
+          },
+          "@cds.persistence.name": "NAME",
+          "type": "cds.String",
+          "length": 100
+        },
+        "Country": {
+          "@Common.Label": {
+            "=": "Country"
+          },
+          "@cds.persistence.name": "COUNTRY",
+          "type": "cds.String",
+          "length": 50
+        }
+      },
+      "$syntax": "projection"
+    },
+    "AppService.Airports": {
+      "kind": "entity",
+      "@Capabilities.DeleteRestrictions.Deletable": false,
+      "@Capabilities.InsertRestrictions.Insertable": false,
+      "@Capabilities.UpdateRestrictions.Updatable": false,
+      "@cds.persistence.name": "APPSERVICE_AIRPORTS",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "app.flight.Airports"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "IATA3": {
+          "@cds.persistence.name": "IATA3",
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "Name": {
+          "@Common.Label": {
+            "=": "Airport"
+          },
+          "@cds.persistence.name": "NAME",
+          "type": "cds.String",
+          "length": 100
+        },
+        "City": {
+          "@Common.Label": {
+            "=": "City"
+          },
+          "@cds.persistence.name": "CITY",
+          "type": "cds.String",
+          "length": 30
+        },
+        "Country": {
+          "@Common.Label": {
+            "=": "Country"
+          },
+          "@cds.persistence.name": "COUNTRY",
+          "type": "cds.String",
+          "length": 50
+        },
+        "Elevation": {
+          "@cds.persistence.name": "ELEVATION",
+          "type": "cds.Integer",
+          "default": {
+            "val": 0
+          }
+        },
+        "Latitude": {
+          "@cds.persistence.name": "LATITUDE",
+          "type": "cds.Decimal",
+          "precision": 12,
+          "scale": 9
+        },
+        "Longitude": {
+          "@cds.persistence.name": "LONGITUDE",
+          "type": "cds.Decimal",
+          "precision": 12,
+          "scale": 9
+        }
+      },
+      "$syntax": "projection"
+    },
+    "AppService.Bookings": {
+      "kind": "entity",
+      "@cds.persistence.name": "APPSERVICE_BOOKINGS",
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "app.booking.Bookings"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "createdAt": {
+          "@cds.persistence.name": "CREATEDAT",
+          "type": "cds.DateTime"
+        },
+        "updatedAt": {
+          "@cds.persistence.name": "UPDATEDAT",
+          "type": "cds.DateTime"
+        },
+        "BookingNo": {
+          "@cds.persistence.name": "BOOKINGNO",
+          "key": true,
+          "type": "cds.String",
+          "length": 25
+        },
+        "Route": {
+          "@cds.persistence.name": "ROUTE",
+          "type": "cds.Association",
+          "target": "AppService.FlightRoutes",
+          "keys": [
+            {
+              "ref": [
+                "ID"
+              ],
+              "$generatedFieldName": "Route_ID"
+            }
+          ]
+        },
+        "CustomerName": {
+          "@cds.persistence.name": "CUSTOMERNAME",
+          "type": "cds.String",
+          "length": 50
+        },
+        "EmailAddress": {
+          "@cds.persistence.name": "EMAILADDRESS",
+          "type": "cds.String",
+          "length": 50
+        },
+        "DateOfTravel": {
+          "@cds.persistence.name": "DATEOFTRAVEL",
+          "type": "cds.DateTime",
+          "notNull": true
+        },
+        "Cost": {
+          "@cds.persistence.name": "COST",
+          "type": "cds.Integer",
+          "notNull": true
+        },
+        "NumberOfPassengers": {
+          "@cds.persistence.name": "NUMBEROFPASSENGERS",
+          "type": "cds.Integer",
+          "default": {
+            "val": 1
+          }
+        },
+        "Route_ID": {
+          "@cds.persistence.name": "ROUTE_ID",
+          "@odata.foreignKey4": "Route",
+          "type": "cds.String",
+          "length": 8
+        }
+      },
+      "$syntax": "projection"
+    },
+    "AppService.FlightRoutes": {
+      "kind": "entity",
+      "@Capabilities.DeleteRestrictions.Deletable": false,
+      "@Capabilities.InsertRestrictions.Insertable": false,
+      "@Capabilities.UpdateRestrictions.Updatable": false,
+      "@cds.persistence.name": "APPSERVICE_FLIGHTROUTES",
+      "@readonly": true,
+      "query": {
+        "SELECT": {
+          "from": {
+            "ref": [
+              "app.flight.FlightRoutes"
+            ]
+          }
+        }
+      },
+      "elements": {
+        "ID": {
+          "@cds.persistence.name": "ID",
+          "key": true,
+          "type": "cds.String",
+          "length": 8
+        },
+        "StartingAirport": {
+          "@cds.persistence.name": "STARTINGAIRPORT",
+          "type": "cds.Association",
+          "cardinality": {
+            "min": 1
+          },
+          "target": "AppService.Airports",
+          "keys": [
+            {
+              "ref": [
+                "IATA3"
+              ],
+              "$generatedFieldName": "StartingAirport_IATA3"
+            }
+          ],
+          "notNull": true
+        },
+        "DestinationAirport": {
+          "@cds.persistence.name": "DESTINATIONAIRPORT",
+          "type": "cds.Association",
+          "cardinality": {
+            "min": 1
+          },
+          "target": "AppService.Airports",
+          "keys": [
+            {
+              "ref": [
+                "IATA3"
+              ],
+              "$generatedFieldName": "DestinationAirport_IATA3"
+            }
+          ],
+          "notNull": true
+        },
+        "Airline": {
+          "@cds.persistence.name": "AIRLINE",
+          "type": "cds.Association",
+          "target": "AppService.Airline",
+          "keys": [
+            {
+              "ref": [
+                "IATA"
+              ],
+              "$generatedFieldName": "Airline_IATA"
+            }
+          ]
+        },
+        "Distance": {
+          "@cds.persistence.name": "DISTANCE",
+          "type": "cds.Integer"
+        },
+        "StartingAirport_IATA3": {
+          "@cds.persistence.name": "STARTINGAIRPORT_IATA3",
+          "@odata.foreignKey4": "StartingAirport",
+          "type": "cds.String",
+          "length": 3,
+          "notNull": true
+        },
+        "DestinationAirport_IATA3": {
+          "@cds.persistence.name": "DESTINATIONAIRPORT_IATA3",
+          "@odata.foreignKey4": "DestinationAirport",
+          "type": "cds.String",
+          "length": 3,
+          "notNull": true
+        },
+        "Airline_IATA": {
+          "@cds.persistence.name": "AIRLINE_IATA",
+          "@odata.foreignKey4": "Airline",
+          "type": "cds.String",
+          "length": 2
+        }
+      },
+      "$syntax": "projection"
+    },
+    "app.booking.Bookings": {
+      "kind": "entity",
+      "@cds.persistence.name": "APP_BOOKING_BOOKINGS",
+      "includes": [
+        "common.Managed"
+      ],
+      "elements": {
+        "createdAt": {
+          "@cds.persistence.name": "CREATEDAT",
+          "type": "cds.DateTime"
+        },
+        "updatedAt": {
+          "@cds.persistence.name": "UPDATEDAT",
+          "type": "cds.DateTime"
+        },
+        "BookingNo": {
+          "@cds.persistence.name": "BOOKINGNO",
+          "key": true,
+          "type": "cds.String",
+          "length": 25
+        },
+        "Route": {
+          "@cds.persistence.name": "ROUTE",
+          "type": "cds.Association",
+          "target": "app.flight.FlightRoutes",
+          "keys": [
+            {
+              "ref": [
+                "ID"
+              ],
+              "$generatedFieldName": "Route_ID"
+            }
+          ]
+        },
+        "CustomerName": {
+          "@cds.persistence.name": "CUSTOMERNAME",
+          "type": "cds.String",
+          "length": 50
+        },
+        "EmailAddress": {
+          "@cds.persistence.name": "EMAILADDRESS",
+          "type": "cds.String",
+          "length": 50
+        },
+        "DateOfTravel": {
+          "@cds.persistence.name": "DATEOFTRAVEL",
+          "type": "cds.DateTime",
+          "notNull": true
+        },
+        "Cost": {
+          "@cds.persistence.name": "COST",
+          "type": "cds.Integer",
+          "notNull": true
+        },
+        "NumberOfPassengers": {
+          "@cds.persistence.name": "NUMBEROFPASSENGERS",
+          "type": "cds.Integer",
+          "default": {
+            "val": 1
+          }
+        },
+        "Route_ID": {
+          "@cds.persistence.name": "ROUTE_ID",
+          "@odata.foreignKey4": "Route",
+          "type": "cds.String",
+          "length": 8
+        }
+      }
+    },
+    "app.flight.Airline": {
+      "kind": "entity",
+      "@cds.persistence.name": "APP_FLIGHT_AIRLINE",
+      "elements": {
+        "IATA": {
+          "@cds.persistence.name": "IATA",
+          "key": true,
+          "type": "cds.String",
+          "length": 2
+        },
+        "Name": {
+          "@Common.Label": {
+            "=": "Airline"
+          },
+          "@cds.persistence.name": "NAME",
+          "type": "cds.String",
+          "length": 100
+        },
+        "Country": {
+          "@Common.Label": {
+            "=": "Country"
+          },
+          "@cds.persistence.name": "COUNTRY",
+          "type": "cds.String",
+          "length": 50
+        }
+      }
+    },
+    "app.flight.Airports": {
+      "kind": "entity",
+      "@cds.persistence.name": "APP_FLIGHT_AIRPORTS",
+      "elements": {
+        "IATA3": {
+          "@cds.persistence.name": "IATA3",
+          "key": true,
+          "type": "cds.String",
+          "length": 3
+        },
+        "Name": {
+          "@Common.Label": {
+            "=": "Airport"
+          },
+          "@cds.persistence.name": "NAME",
+          "type": "cds.String",
+          "length": 100
+        },
+        "City": {
+          "@Common.Label": {
+            "=": "City"
+          },
+          "@cds.persistence.name": "CITY",
+          "type": "cds.String",
+          "length": 30
+        },
+        "Country": {
+          "@Common.Label": {
+            "=": "Country"
+          },
+          "@cds.persistence.name": "COUNTRY",
+          "type": "cds.String",
+          "length": 50
+        },
+        "Elevation": {
+          "@cds.persistence.name": "ELEVATION",
+          "type": "cds.Integer",
+          "default": {
+            "val": 0
+          }
+        },
+        "Latitude": {
+          "@cds.persistence.name": "LATITUDE",
+          "type": "cds.Decimal",
+          "precision": 12,
+          "scale": 9
+        },
+        "Longitude": {
+          "@cds.persistence.name": "LONGITUDE",
+          "type": "cds.Decimal",
+          "precision": 12,
+          "scale": 9
+        }
+      }
+    },
+    "app.flight.FlightRoutes": {
+      "kind": "entity",
+      "@cds.persistence.name": "APP_FLIGHT_FLIGHTROUTES",
+      "elements": {
+        "ID": {
+          "@cds.persistence.name": "ID",
+          "key": true,
+          "type": "cds.String",
+          "length": 8
+        },
+        "StartingAirport": {
+          "@cds.persistence.name": "STARTINGAIRPORT",
+          "type": "cds.Association",
+          "cardinality": {
+            "min": 1
+          },
+          "target": "app.flight.Airports",
+          "keys": [
+            {
+              "ref": [
+                "IATA3"
+              ],
+              "$generatedFieldName": "StartingAirport_IATA3"
+            }
+          ],
+          "notNull": true
+        },
+        "DestinationAirport": {
+          "@cds.persistence.name": "DESTINATIONAIRPORT",
+          "type": "cds.Association",
+          "cardinality": {
+            "min": 1
+          },
+          "target": "app.flight.Airports",
+          "keys": [
+            {
+              "ref": [
+                "IATA3"
+              ],
+              "$generatedFieldName": "DestinationAirport_IATA3"
+            }
+          ],
+          "notNull": true
+        },
+        "Airline": {
+          "@cds.persistence.name": "AIRLINE",
+          "type": "cds.Association",
+          "target": "app.flight.Airline",
+          "keys": [
+            {
+              "ref": [
+                "IATA"
+              ],
+              "$generatedFieldName": "Airline_IATA"
+            }
+          ]
+        },
+        "Distance": {
+          "@cds.persistence.name": "DISTANCE",
+          "type": "cds.Integer"
+        },
+        "StartingAirport_IATA3": {
+          "@cds.persistence.name": "STARTINGAIRPORT_IATA3",
+          "@odata.foreignKey4": "StartingAirport",
+          "type": "cds.String",
+          "length": 3,
+          "notNull": true
+        },
+        "DestinationAirport_IATA3": {
+          "@cds.persistence.name": "DESTINATIONAIRPORT_IATA3",
+          "@odata.foreignKey4": "DestinationAirport",
+          "type": "cds.String",
+          "length": 3,
+          "notNull": true
+        },
+        "Airline_IATA": {
+          "@cds.persistence.name": "AIRLINE_IATA",
+          "@odata.foreignKey4": "Airline",
+          "type": "cds.String",
+          "length": 2
+        }
+      }
+    },
+    "common.Managed": {
+      "kind": "entity",
+      "@cds.persistence.name": "COMMON_MANAGED",
+      "abstract": true,
+      "elements": {
+        "createdAt": {
+          "@cds.persistence.name": "CREATEDAT",
+          "type": "cds.DateTime"
+        },
+        "updatedAt": {
+          "@cds.persistence.name": "UPDATEDAT",
+          "type": "cds.DateTime"
+        }
+      }
+    }
+  },
+  "version": {
+    "csn": "1.0"
+  },
+  "meta": {
+    "creator": "CDS Compiler v1.13.4"
+  },
+  "$version": "1.0",
+  "@sql_mapping": "plain"
+}
