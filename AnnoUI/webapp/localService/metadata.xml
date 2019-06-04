@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="1.0" xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx"
+	xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns:sap="http://www.sap.com/Protocols/SAPData">
+	<edmx:Reference Uri="https://oasis-tcs.github.io/odata-vocabularies/vocabularies/Org.OData.Capabilities.V1.xml"
+		xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+		<edmx:Include Alias="Capabilities" Namespace="Org.OData.Capabilities.V1"/>
+	</edmx:Reference>
+	<edmx:Reference Uri="https://wiki.scn.sap.com/wiki/download/attachments/448470974/Common.xml?api=v2"
+		xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+		<edmx:Include Alias="Common" Namespace="com.sap.vocabularies.Common.v1"/>
+	</edmx:Reference>
+	<edmx:DataServices m:DataServiceVersion="2.0">
+		<Schema Namespace="AppService" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+			<EntityContainer Name="EntityContainer" m:IsDefaultEntityContainer="true">
+				<EntitySet Name="Airline" EntityType="AppService.Airline"/>
+				<EntitySet Name="Airports" EntityType="AppService.Airports"/>
+				<EntitySet Name="Bookings" EntityType="AppService.Bookings"/>
+				<EntitySet Name="FlightRoutes" EntityType="AppService.FlightRoutes"/>
+				<AssociationSet Name="Bookings_Route" Association="AppService.Bookings_Route">
+					<End Role="Bookings" EntitySet="Bookings"/>
+					<End Role="FlightRoutes" EntitySet="FlightRoutes"/>
+				</AssociationSet>
+				<AssociationSet Name="FlightRoutes_StartingAirport" Association="AppService.FlightRoutes_StartingAirport">
+					<End Role="FlightRoutes" EntitySet="FlightRoutes"/>
+					<End Role="Airports" EntitySet="Airports"/>
+				</AssociationSet>
+				<AssociationSet Name="FlightRoutes_DestinationAirport" Association="AppService.FlightRoutes_DestinationAirport">
+					<End Role="FlightRoutes" EntitySet="FlightRoutes"/>
+					<End Role="Airports" EntitySet="Airports"/>
+				</AssociationSet>
+				<AssociationSet Name="FlightRoutes_Airline" Association="AppService.FlightRoutes_Airline">
+					<End Role="FlightRoutes" EntitySet="FlightRoutes"/>
+					<End Role="Airline" EntitySet="Airline"/>
+				</AssociationSet>
+			</EntityContainer>
+			<EntityType Name="Airline">
+				<Key>
+					<PropertyRef Name="IATA"/>
+				</Key>
+				<Property Name="IATA" Type="Edm.String" MaxLength="2" Nullable="false"/>
+				<Property Name="Name" Type="Edm.String" MaxLength="100"/>
+				<Property Name="Country" Type="Edm.String" MaxLength="50"/>
+			</EntityType>
+			<EntityType Name="Airports">
+				<Key>
+					<PropertyRef Name="IATA3"/>
+				</Key>
+				<Property Name="IATA3" Type="Edm.String" MaxLength="3" Nullable="false"/>
+				<Property Name="Name" Type="Edm.String" MaxLength="100"/>
+				<Property Name="City" Type="Edm.String" MaxLength="30"/>
+				<Property Name="Country" Type="Edm.String" MaxLength="50"/>
+				<Property Name="Elevation" Type="Edm.Int32"/>
+				<Property Name="Latitude" Type="Edm.Decimal" Scale="9" Precision="12"/>
+				<Property Name="Longitude" Type="Edm.Decimal" Scale="9" Precision="12"/>
+			</EntityType>
+			<EntityType Name="Bookings">
+				<Key>
+					<PropertyRef Name="BookingNo"/>
+				</Key>
+				<Property Name="createdAt" Type="Edm.DateTimeOffset"/>
+				<Property Name="updatedAt" Type="Edm.DateTimeOffset"/>
+				<Property Name="BookingNo" Type="Edm.String" MaxLength="25" Nullable="false"/>
+				<NavigationProperty Name="Route" Relationship="AppService.Bookings_Route" FromRole="Bookings" ToRole="FlightRoutes"/>
+				<Property Name="CustomerName" Type="Edm.String" MaxLength="50"/>
+				<Property Name="EmailAddress" Type="Edm.String" MaxLength="50"/>
+				<Property Name="DateOfTravel" Type="Edm.DateTimeOffset" Nullable="false"/>
+				<Property Name="Cost" Type="Edm.Int32" Nullable="false"/>
+				<Property Name="NumberOfPassengers" Type="Edm.Int32"/>
+				<Property Name="Route_ID" Type="Edm.String" MaxLength="8"/>
+			</EntityType>
+			<EntityType Name="FlightRoutes">
+				<Key>
+					<PropertyRef Name="ID"/>
+				</Key>
+				<Property Name="ID" Type="Edm.String" MaxLength="8" Nullable="false"/>
+				<NavigationProperty Name="StartingAirport" Relationship="AppService.FlightRoutes_StartingAirport" FromRole="FlightRoutes" ToRole="Airports"/>
+				<NavigationProperty Name="DestinationAirport" Relationship="AppService.FlightRoutes_DestinationAirport" FromRole="FlightRoutes"
+					ToRole="Airports"/>
+				<NavigationProperty Name="Airline" Relationship="AppService.FlightRoutes_Airline" FromRole="FlightRoutes" ToRole="Airline"/>
+				<Property Name="Distance" Type="Edm.Int32"/>
+				<Property Name="StartingAirport_IATA3" Type="Edm.String" MaxLength="3" Nullable="false"/>
+				<Property Name="DestinationAirport_IATA3" Type="Edm.String" MaxLength="3" Nullable="false"/>
+				<Property Name="Airline_IATA" Type="Edm.String" MaxLength="2"/>
+			</EntityType>
+			<Association Name="Bookings_Route">
+				<End Role="Bookings" Type="AppService.Bookings" Multiplicity="*"/>
+				<End Role="FlightRoutes" Type="AppService.FlightRoutes" Multiplicity="0..1"/>
+				<ReferentialConstraint>
+					<Principal Role="FlightRoutes">
+						<PropertyRef Name="ID"/>
+					</Principal>
+					<Dependent Role="Bookings">
+						<PropertyRef Name="Route_ID"/>
+					</Dependent>
+				</ReferentialConstraint>
+			</Association>
+			<Association Name="FlightRoutes_StartingAirport">
+				<End Role="FlightRoutes" Type="AppService.FlightRoutes" Multiplicity="*"/>
+				<End Role="Airports" Type="AppService.Airports" Multiplicity="1"/>
+				<ReferentialConstraint>
+					<Principal Role="Airports">
+						<PropertyRef Name="IATA3"/>
+					</Principal>
+					<Dependent Role="FlightRoutes">
+						<PropertyRef Name="StartingAirport_IATA3"/>
+					</Dependent>
+				</ReferentialConstraint>
+			</Association>
+			<Association Name="FlightRoutes_DestinationAirport">
+				<End Role="FlightRoutes" Type="AppService.FlightRoutes" Multiplicity="*"/>
+				<End Role="Airports" Type="AppService.Airports" Multiplicity="1"/>
+				<ReferentialConstraint>
+					<Principal Role="Airports">
+						<PropertyRef Name="IATA3"/>
+					</Principal>
+					<Dependent Role="FlightRoutes">
+						<PropertyRef Name="DestinationAirport_IATA3"/>
+					</Dependent>
+				</ReferentialConstraint>
+			</Association>
+			<Association Name="FlightRoutes_Airline">
+				<End Role="FlightRoutes" Type="AppService.FlightRoutes" Multiplicity="*"/>
+				<End Role="Airline" Type="AppService.Airline" Multiplicity="0..1"/>
+				<ReferentialConstraint>
+					<Principal Role="Airline">
+						<PropertyRef Name="IATA"/>
+					</Principal>
+					<Dependent Role="FlightRoutes">
+						<PropertyRef Name="Airline_IATA"/>
+					</Dependent>
+				</ReferentialConstraint>
+			</Association>
+			<Annotations Target="AppService.EntityContainer/Airline" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+				<Annotation Term="Capabilities.DeleteRestrictions">
+					<Record Type="Capabilities.DeleteRestrictionsType">
+						<PropertyValue Property="Deletable" Bool="false"/>
+					</Record>
+				</Annotation>
+				<Annotation Term="Capabilities.InsertRestrictions">
+					<Record Type="Capabilities.InsertRestrictionsType">
+						<PropertyValue Property="Insertable" Bool="false"/>
+					</Record>
+				</Annotation>
+				<Annotation Term="Capabilities.UpdateRestrictions">
+					<Record Type="Capabilities.UpdateRestrictionsType">
+						<PropertyValue Property="Updatable" Bool="false"/>
+					</Record>
+				</Annotation>
+			</Annotations>
+			<Annotations Target="AppService.Airline/Name" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+				<Annotation Term="Common.Label" Path="Airline"/>
+			</Annotations>
+			<Annotations Target="AppService.Airline/Country" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+				<Annotation Term="Common.Label" Path="Country"/>
+			</Annotations>
+			<Annotations Target="AppService.EntityContainer/Airports" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+				<Annotation Term="Capabilities.DeleteRestrictions">
+					<Record Type="Capabilities.DeleteRestrictionsType">
+						<PropertyValue Property="Deletable" Bool="false"/>
+					</Record>
+				</Annotation>
+				<Annotation Term="Capabilities.InsertRestrictions">
+					<Record Type="Capabilities.InsertRestrictionsType">
+						<PropertyValue Property="Insertable" Bool="false"/>
+					</Record>
+				</Annotation>
+				<Annotation Term="Capabilities.UpdateRestrictions">
+					<Record Type="Capabilities.UpdateRestrictionsType">
+						<PropertyValue Property="Updatable" Bool="false"/>
+					</Record>
+				</Annotation>
+			</Annotations>
+			<Annotations Target="AppService.Airports/Name" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+				<Annotation Term="Common.Label" Path="Airport"/>
+			</Annotations>
+			<Annotations Target="AppService.Airports/City" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+				<Annotation Term="Common.Label" Path="City"/>
+			</Annotations>
+			<Annotations Target="AppService.Airports/Country" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+				<Annotation Term="Common.Label" Path="Country"/>
+			</Annotations>
+			<Annotations Target="AppService.EntityContainer/FlightRoutes" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+				<Annotation Term="Capabilities.DeleteRestrictions">
+					<Record Type="Capabilities.DeleteRestrictionsType">
+						<PropertyValue Property="Deletable" Bool="false"/>
+					</Record>
+				</Annotation>
+				<Annotation Term="Capabilities.InsertRestrictions">
+					<Record Type="Capabilities.InsertRestrictionsType">
+						<PropertyValue Property="Insertable" Bool="false"/>
+					</Record>
+				</Annotation>
+				<Annotation Term="Capabilities.UpdateRestrictions">
+					<Record Type="Capabilities.UpdateRestrictionsType">
+						<PropertyValue Property="Updatable" Bool="false"/>
+					</Record>
+				</Annotation>
+			</Annotations>
+		</Schema>
+	</edmx:DataServices>
+</edmx:Edmx>

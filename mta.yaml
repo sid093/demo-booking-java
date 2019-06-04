@@ -25,9 +25,34 @@ modules:
           JBP_CONFIG_RESOURCE_CONFIGURATION: '[tomcat/webapps/ROOT/META-INF/context.xml:
             {"service_name_for_DefaultDB" : "~{hdi-container-name}"}]'
       - name: demo-booking-java-uaa
+
+  - name: AnnoUI
+    type: html5
+    path: AnnoUI
+    parameters:
+       disk-quota: 256M
+       memory: 256M
+    build-parameters:
+       builder: grunt
+    requires:
+     - name: srv_api
+       group: destinations
+       properties:
+          forwardAuthToken: true
+          strictSSL: false
+          name: srv_api
+          url: ~{url}
+     - name: demo-booking-java-uaa
+
+
+  
+
 resources:
   - name: demo-booking-java-db-hdi-container
     type: com.sap.xs.hdi-container
+    parameters:
+      service: hanatrial
+      service-plan: hdi-shared
     properties:
       hdi-container-name: ${service-name}
   - name: demo-booking-java-uaa
